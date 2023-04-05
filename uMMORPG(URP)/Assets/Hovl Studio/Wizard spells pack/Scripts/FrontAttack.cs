@@ -98,7 +98,7 @@ public class FrontAttack : MonoBehaviour
                     //to create effects on terrain
                     if (Terrain.activeTerrain != null)
                     {
-                        pos.y = Terrain.activeTerrain.SampleHeight(transform.position);
+                        pos.y = pivot.transform.position.y;
                     }
 
                     var craterInstance = Instantiate(craterPrefab, pos, Quaternion.identity);
