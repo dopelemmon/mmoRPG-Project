@@ -19,7 +19,7 @@ public class PlayerStatsAndAttributes : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        healthRegen(0.2f, 0f);
+        //healthRegen(0.2f, 0f);
     }
 
     public void takeDamage(float damageAmmount)

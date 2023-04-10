@@ -40,6 +40,8 @@ public class EnemyAi : MonoBehaviour
     public float enemyArmor;
 
     int attackSelector;
+    int currentAttackMode;
+    bool hasDealtDamage = false;
     private void Start()
     {
         player = GameObject.FindWithTag("Player").transform;
@@ -111,6 +113,7 @@ public class EnemyAi : MonoBehaviour
         animator.SetBool("isRunning", true);
         agent.SetDestination(player.position);
         animator.SetBool("isAttacking", false);
+        animator.SetInteger("Attack Selector", 0);
     }
 
     private void AttackPlayer()
@@ -121,17 +124,16 @@ public class EnemyAi : MonoBehaviour
         agent.SetDestination(transform.position);
         transform.LookAt(player);
         animator.SetBool("isAttacking", true);
+
+        
         if(!alreadyAttacked)
         {
+            
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
 
-            attackSelector = Random.Range(0, 3);
-            animator.SetInteger("Attack Selector", attackSelector);
-            if(attackSelector != 0)
-            {
-                playerStats.takeDamage(25f);
-            }
+            Attack();
+
 
         }
 
@@ -167,9 +169,38 @@ public class EnemyAi : MonoBehaviour
             enemyArmor -= damageAmmount;
         }
     }
-
-    public void OnTriggerEnter(Collider other)
+    // animation attack 01 damage dealer
+    public void Attack01(float damageAmmount)
     {
-        takeDamage(10);
+        if(playerStats.playerArmor <=0f)
+        {
+            playerStats.playerHealth -= damageAmmount;
+        }
+        else{
+            playerStats.playerArmor -= damageAmmount;
+        }
     }
+    // animation attack 02 damage dealer
+    public void Attack02(float damageAmmount)
+    {
+        if(playerStats.playerArmor <=0f)
+        {
+            playerStats.playerHealth -= damageAmmount;
+        }
+        else{
+            playerStats.playerArmor -= damageAmmount;
+        }
+    }
+    public void Attack()
+    {
+        attackSelector = Random.Range(1, 10);
+        animator.SetInteger("Attack Selector", attackSelector);
+    }
+
+
+        
+        
+
+        
 }
+
