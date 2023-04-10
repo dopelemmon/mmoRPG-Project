@@ -11,7 +11,6 @@ public class HS_MovementInput : MonoBehaviour
 {
     public float velocity = 9;
     [Space]
-
     public float InputX;
     public float InputZ;
     public Vector3 desiredMoveDirection;
@@ -22,7 +21,6 @@ public class HS_MovementInput : MonoBehaviour
     public float allowPlayerRotation = 0.1f;
     public Camera cam;
     public CharacterController controller;
-    public bool isGrounded;
     private float secondLayerWeight = 0;
 
     [Space]
@@ -47,6 +45,8 @@ public class HS_MovementInput : MonoBehaviour
     public GameObject[] Prefabs;
     public GameObject[] PrefabsCast;
     public GameObject[] UltimatePrefab;
+    public CapsuleCollider capsuleCollider;
+    public EnemyAi enemy;
     private bool canUlt = false;
     private bool useUlt = false;
     private ParticleSystem currEffect;
@@ -177,6 +177,7 @@ public class HS_MovementInput : MonoBehaviour
                 projectile.GetComponent<TargetProjectile>().UpdateTarget(target, (Vector3)uiOffset);
                 Effect = Prefabs[8].GetComponent<ParticleSystem>();
                 Effect.Play();
+                
                 //Get Audiosource from Prefabs if exist
                 if (Prefabs[8].GetComponent<AudioSource>())
                 {
@@ -651,69 +652,6 @@ public class HS_MovementInput : MonoBehaviour
         canMove = true;
     }
 
-    void PlayerMoveAndRotation()
-    {
-        // InputX = Input.GetAxis("Horizontal");
-        // InputZ = Input.GetAxis("Vertical");
-
-        // var camera = Camera.main;
-        // var forward = cam.transform.forward;
-        // var right = cam.transform.right;
-
-        // forward.y = 0f;
-        // right.y = 0f;
-
-        // forward.Normalize();
-        // right.Normalize();
-
-        // //Movement vector
-        // desiredMoveDirection = forward * InputZ + right * InputX;
-
-        // //Character diagonal movement faster fix
-        // desiredMoveDirection.Normalize();
-
-        // if (blockRotationPlayer == false)
-        // {
-        //     //You can use desiredMoveDirection if using InputMagnitude instead of Horizontal&Vertical axis
-        //     transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(forward), desiredRotationSpeed);
-        //     //Limit back speed
-        //     if (InputZ < -0.5)
-        //         controller.Move(desiredMoveDirection.normalized * Time.deltaTime * (velocity / 1.5f));
-        //     //else if (InputX < -0.1 || InputX > 0.1)
-        //     //    controller.Move(desiredMoveDirection * Time.deltaTime * (velocity / 1.2f));
-        //     if(InputX < -0.1f || InputX > 0.1f)
-        //     {
-        //         controller.Move(desiredMoveDirection.normalized * Time.deltaTime * (velocity / 1.5f));
-        //     }
-        //     else
-        //         controller.Move(desiredMoveDirection.normalized * Time.deltaTime * velocity);
-        // }
-    }
-
-    void InputMagnitude()
-    {
-        // //Calculate Input Vectors
-        // InputX = Input.GetAxis("Horizontal");
-        // InputZ = Input.GetAxis("Vertical");
-
-        // anim.SetFloat("InputZ", InputZ, VerticalAnimTime, Time.deltaTime * 2f);
-        // anim.SetFloat("InputX", InputX, HorizontalAnimSmoothTime, Time.deltaTime * 2f);
-
-        // //Calculate the Input Magnitude
-        // Speed = new Vector2(InputX, InputZ).sqrMagnitude;
-
-        // //Physically move player
-        // if (Speed > allowPlayerRotation)
-        // {
-        //     anim.SetFloat("InputMagnitude", Speed, StartAnimTime, Time.deltaTime);
-        //     PlayerMoveAndRotation();
-        // }
-        // else if (Speed < allowPlayerRotation)
-        // {
-        //     anim.SetFloat("InputMagnitude", Speed, StopAnimTime, Time.deltaTime);
-        // }
-    }
-
     public int targetIndex()
     {
         float[] distances = new float[screenTargets.Count];
@@ -733,4 +671,7 @@ public class HS_MovementInput : MonoBehaviour
         }
         return index;
     }
+
+
+
 }

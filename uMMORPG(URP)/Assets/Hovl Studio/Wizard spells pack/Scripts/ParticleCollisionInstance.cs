@@ -17,6 +17,8 @@ public class ParticleCollisionInstance : MonoBehaviour
     private List<ParticleCollisionEvent> collisionEvents = new List<ParticleCollisionEvent>();
     private ParticleSystem ps;
 
+    public EnemyAi enemy;
+
     void Start()
     {
         part = GetComponent<ParticleSystem>();
@@ -43,6 +45,7 @@ public class ParticleCollisionInstance : MonoBehaviour
         if (DestoyMainEffect == true)
         {
             Destroy(gameObject, DestroyTimeDelay + 0.5f);
+            enemy.takeDamage(10f);
         }
     }
 }

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class TargetProjectile : MonoBehaviour
 {
+    public EnemyAi enemy;
+    // public EnemyAi enemyAi;
     public float speed = 15f;
     public GameObject hit;
     public GameObject flash;
@@ -19,10 +21,15 @@ public class TargetProjectile : MonoBehaviour
     public float sideAngle = 25;
     public float upAngle = 20;
 
+
+
     void Start()
     {
         FlashEffect();
         newRandom();
+
+        enemy = GameObject.Find("GolemPBRMaskTint").GetComponent<EnemyAi>();
+        
     }
 
     void newRandom()
@@ -90,7 +97,7 @@ public class TargetProjectile : MonoBehaviour
         }
     }
 
-    void HitTarget()
+    public void HitTarget()
     {
         if (hit != null)
         {
@@ -104,6 +111,8 @@ public class TargetProjectile : MonoBehaviour
             if (hitPs != null)
             {
                 Destroy(hitInstance, hitPs.main.duration);
+                enemy.enemyHealth -= 10f;
+                
             }
             else
             {
@@ -119,5 +128,13 @@ public class TargetProjectile : MonoBehaviour
             }
         }
         Destroy(gameObject);
+    }
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.tag == "Enemy")
+        {
+                
+        }
     }
 }
