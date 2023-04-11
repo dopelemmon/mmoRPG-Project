@@ -160,14 +160,32 @@ public class EnemyAi : MonoBehaviour
 
     public void takeDamage(float damageAmmount)
     {
-        if(enemyArmor < 0.0f)
+        
+        if(enemyArmor <= 0.0f)
         {
             enemyHealth -= damageAmmount;
+            animator.SetTrigger("isGettingHit");
+            if(enemyHealth < damageAmmount) // checking if the damage ammount is greater than current enemyhealth
+            {
+                enemyHealth = 0; // setting the health ammount to 0
+            }
+            if(enemyHealth == 0)
+            {
+                animator.SetBool("isDead", true);
+            }
         
         }
-        else{
+        else {
             enemyArmor -= damageAmmount;
+            animator.SetTrigger("isGettingHit");
+            if(enemyArmor < damageAmmount)
+            {
+                enemyArmor = 0f;
+            }
         }
+
+        
+
     }
     // animation attack 01 damage dealer
     public void Attack01(float damageAmmount)
