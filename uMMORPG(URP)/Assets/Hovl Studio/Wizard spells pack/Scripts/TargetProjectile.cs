@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class TargetProjectile : MonoBehaviour
 {
-    public EnemyAi enemy;
+    public EnemyAi[] enemy;
+    public HS_MovementInput hS_MovementInput;
     // public EnemyAi enemyAi;
     public float speed = 15f;
     public GameObject hit;
@@ -20,16 +21,19 @@ public class TargetProjectile : MonoBehaviour
     private float randomSideAngle;
     public float sideAngle = 25;
     public float upAngle = 20;
-
-
+    private float radius;
 
     void Start()
     {
         FlashEffect();
         newRandom();
 
-        enemy = GameObject.Find("GolemPBRMaskTint").GetComponent<EnemyAi>();
-        
+        hS_MovementInput = GameObject.FindWithTag("Player").GetComponent<HS_MovementInput>();
+        for(int i = 0; i < enemy.Length; i++)
+        {
+            
+            enemy[i] = GameObject.FindWithTag("Player").GetComponent<HS_MovementInput>().screenTargets[i].GetComponent<EnemyAi>();
+        }
     }
 
     void newRandom()
@@ -88,6 +92,7 @@ public class TargetProjectile : MonoBehaviour
             if (flashPs != null)
             {
                 Destroy(flashInstance, flashPs.main.duration);
+                
             }
             else
             {
@@ -97,44 +102,50 @@ public class TargetProjectile : MonoBehaviour
         }
     }
 
-    public void HitTarget()
+public void HitTarget()
+{
+    if (hit != null)
     {
-        if (hit != null)
+        var hitRotation = transform.rotation;
+        if (LocalRotation == true)
         {
-            var hitRotation = transform.rotation;
-            if (LocalRotation == true)
+            hitRotation = Quaternion.Euler(0, 0, 0);
+        }
+
+        Collider[] colliders = Physics.OverlapSphere(transform.position, radius);
+        foreach (Collider collider in colliders)
+        {
+            EnemyAi enemy = collider.GetComponent<EnemyAi>();
+            if (enemy != null && hS_MovementInput.activeTarger)
             {
-                hitRotation = Quaternion.Euler(0, 0, 0);
-            }
-            var hitInstance = Instantiate(hit, target.position + targetOffset, hitRotation);
-            var hitPs = hitInstance.GetComponent<ParticleSystem>();
-            if (hitPs != null)
-            {
-                Destroy(hitInstance, hitPs.main.duration);
-                enemy.enemyHealth -= 10f;
-                
-            }
-            else
-            {
-                var hitPsParts = hitInstance.transform.GetChild(0).GetComponent<ParticleSystem>();
-                Destroy(hitInstance, hitPsParts.main.duration);
+                // Instantiate hit effect
+                var hitInstance = Instantiate(hit, enemy.transform.position + targetOffset, hitRotation);
+                var hitPs = hitInstance.GetComponent<ParticleSystem>();
+                if (hitPs != null)
+                {
+                    Destroy(hitInstance, hitPs.main.duration);
+                    enemy.takeDamage(5);
+                }
+                else
+                {
+                    var hitPsParts = hitInstance.transform.GetChild(0).GetComponent<ParticleSystem>();
+                    Destroy(hitInstance, hitPsParts.main.duration);
+                }
             }
         }
-        foreach (var detachedPrefab in Detached)
-        {
-            if (detachedPrefab != null)
-            {
-                detachedPrefab.transform.parent = null;
-            }
-        }
-        Destroy(gameObject);
     }
 
-    public void OnCollisionEnter(Collision collision)
+    foreach (var detachedPrefab in Detached)
     {
-        if(collision.gameObject.tag == "Enemy")
+        if (detachedPrefab != null)
         {
-                
+            detachedPrefab.transform.parent = null;
         }
     }
+    Destroy(gameObject);
+}
+
+
+
+
 }

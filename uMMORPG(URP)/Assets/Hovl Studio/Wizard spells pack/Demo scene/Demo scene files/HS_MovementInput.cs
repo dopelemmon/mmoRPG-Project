@@ -64,9 +64,12 @@ public class HS_MovementInput : MonoBehaviour
     public GameObject[] ultIcons;
     public Image aim;
     public Vector2 uiOffset;
-    public List<Transform> screenTargets = new List<Transform>();
-    private Transform target;
-    private bool activeTarger = false;
+    public EnemyAi[] enemyTarget;
+    public int maxEnemyTarget;
+    public int currentScreenTargetSize;
+    public List<GameObject> screenTargets = new List<GameObject>();
+    public Transform target;
+    public bool activeTarger = false;
     public Transform FirePoint;
     public float fireRate = 0.1f;
     private float fireCountdown = 0f;
@@ -89,18 +92,28 @@ public class HS_MovementInput : MonoBehaviour
         anim = GetComponent<Animator>();
         cam = Camera.main;
         controller = GetComponent<CharacterController>();
+        maxEnemyTarget = enemyTarget.Length;
+        
         
         //Get clip from Audiosource from projectile if exist for playing when shooting
         if (Prefabs[8].GetComponent<AudioSource>())
         {
             soundComponent = Prefabs[8].GetComponent<AudioSource>();
         }
+        for(int i = 0; i < maxEnemyTarget; i++)
+        {
+            enemyTarget[i] = GetComponent<EnemyAi>();
+        }
     }
 
     void Update()
     {
-        target = screenTargets[targetIndex()];
-
+        currentScreenTargetSize = screenTargets.Count;
+        if(screenTargets.Count != 0)
+        {
+            target = screenTargets[targetIndex()].transform;
+            
+        }
         if (Input.GetMouseButtonDown(1) && casting == true)
         {
             casting = false;
@@ -166,7 +179,7 @@ public class HS_MovementInput : MonoBehaviour
 
         if (Input.GetMouseButton(0) && aim.enabled == true && activeTarger)
         {
-            if (rotateState == false)
+            if (rotateState == false && screenTargets.Count != 0)
             {
                 StartCoroutine(RotateToTarget(fireRate, target.position));
             }
@@ -322,28 +335,39 @@ public class HS_MovementInput : MonoBehaviour
     private void UserInterface()
     {
         Vector3 screenCenter = new Vector3(Screen.width, Screen.height, 0) / 2;
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(target.position + (Vector3)uiOffset);
-        Vector3 CornerDistance = screenPos - screenCenter;
-        Vector3 absCornerDistance = new Vector3(Mathf.Abs(CornerDistance.x), Mathf.Abs(CornerDistance.y), Mathf.Abs(CornerDistance.z));
+        if(screenTargets.Count != 0)
+        {
+            Vector3 screenPos = Camera.main.WorldToScreenPoint(target.position + (Vector3)uiOffset);
+            Vector3 CornerDistance = screenPos - screenCenter;
+            Vector3 absCornerDistance = new Vector3(Mathf.Abs(CornerDistance.x), Mathf.Abs(CornerDistance.y), Mathf.Abs(CornerDistance.z));
+        
+        
+        
 
-        //This way you can find target on the full screen
-        //if (screenPos.z > 0 && screenPos.x > 0 && screenPos.x < Screen.width && screenPos.y > 0 && screenPos.y < Screen.height)
-        // {screenPos.x > 0 && screenPos.y > 0 && screenPos.z > 0} - disable target if enemy backside
-        //Find target near center of the screen     
-        if (absCornerDistance.x < screenCenter.x / 3 && absCornerDistance.y < screenCenter.y / 3 && screenPos.x > 0 && screenPos.y > 0 && screenPos.z > 0 //If target is in the middle of the screen
-            && !Physics.Linecast(transform.position + (Vector3)uiOffset, target.position + (Vector3)uiOffset * 2, collidingLayer)) //If player can see the target
-        {
-            aim.transform.position = Vector3.MoveTowards(aim.transform.position, screenPos, Time.deltaTime * 3000);
-            if (!activeTarger)
-                activeTarger = true;
+            //This way you can find target on the full screen
+            //if (screenPos.z > 0 && screenPos.x > 0 && screenPos.x < Screen.width && screenPos.y > 0 && screenPos.y < Screen.height)
+            // {screenPos.x > 0 && screenPos.y > 0 && screenPos.z > 0} - disable target if enemy backside
+            //Find target near center of the screen     
+            if (absCornerDistance.x < screenCenter.x / 3 && absCornerDistance.y < screenCenter.y / 3 && screenPos.x > 0 && screenPos.y > 0 && screenPos.z > 0 //If target is in the middle of the screen
+                && !Physics.Linecast(transform.position + (Vector3)uiOffset, target.position + (Vector3)uiOffset * 2, collidingLayer)) //If player can see the target
+            {
+                aim.transform.position = Vector3.MoveTowards(aim.transform.position, screenPos, Time.deltaTime * 3000);
+                if (!activeTarger)
+                    activeTarger = true;
+            }
+            else
+            {
+                //Another way
+                //aim.GetComponent<RectTransform>().localPosition = new Vector3(0, 0, 0);
+                aim.transform.position = Vector3.MoveTowards(aim.transform.position, screenCenter, Time.deltaTime * 3000);
+                if (activeTarger)
+                    activeTarger = false;
         }
-        else
-        {
-            //Another way
-            //aim.GetComponent<RectTransform>().localPosition = new Vector3(0, 0, 0);
-            aim.transform.position = Vector3.MoveTowards(aim.transform.position, screenCenter, Time.deltaTime * 3000);
-            if (activeTarger)
-                activeTarger = false;
+        }
+        else{
+            Vector3 defaultScreenPos = new Vector3(Screen.width, Screen.height, 0) / 2;
+            Vector3 centerCS = Camera.main.WorldToScreenPoint(screenCenter + (Vector3)uiOffset);
+            aim.transform.position = Vector3.MoveTowards(aim.transform.position, defaultScreenPos, Time.deltaTime * 3000);
         }
     }
 
@@ -657,8 +681,11 @@ public class HS_MovementInput : MonoBehaviour
         float[] distances = new float[screenTargets.Count];
 
         for (int i = 0; i < screenTargets.Count; i++)
-        {
-            distances[i] = Vector2.Distance(Camera.main.WorldToScreenPoint(screenTargets[i].position), new Vector2(Screen.width / 2, Screen.height / 2));
+        {   
+            if(!enemy.isDead)
+            {
+            distances[i] = Vector2.Distance(Camera.main.WorldToScreenPoint(screenTargets[i].transform.position), new Vector2(Screen.width / 2, Screen.height / 2));
+            }
         }
 
         float minDistance = Mathf.Min(distances);
@@ -671,6 +698,12 @@ public class HS_MovementInput : MonoBehaviour
         }
         return index;
     }
+
+    void FireProjectile()
+{
+    
+}
+
 
 
 

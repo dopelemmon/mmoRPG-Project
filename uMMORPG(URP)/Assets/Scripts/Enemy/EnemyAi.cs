@@ -6,6 +6,7 @@ using UnityEngine.AI;
 public class EnemyAi : MonoBehaviour
 {
     public NavMeshAgent agent;
+    HS_MovementInput hS_MovementInput;
 
     public Transform player;
 
@@ -38,6 +39,7 @@ public class EnemyAi : MonoBehaviour
     ///Enemy Stats
     public float enemyHealth;
     public float enemyArmor;
+    public bool isDead;
 
     int attackSelector;
     int currentAttackMode;
@@ -48,6 +50,7 @@ public class EnemyAi : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         playerStats = mainPlayer.GetComponent<PlayerStatsAndAttributes>();
+        hS_MovementInput = mainPlayer.GetComponent<HS_MovementInput>();
     }
 
     // Update is called once per frame
@@ -57,9 +60,12 @@ public class EnemyAi : MonoBehaviour
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
         playerInAttackrange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
 
-        if(!playerInSightRange && !playerInAttackrange)Patrolling();
-        if(playerInSightRange && !playerInAttackrange)ChasePlayer();
-        if(playerInSightRange && playerInAttackrange)AttackPlayer();
+        
+        
+            if(!playerInSightRange && !playerInAttackrange)Patrolling();
+            if(playerInSightRange && !playerInAttackrange)ChasePlayer();
+            if(playerInSightRange && playerInAttackrange)AttackPlayer();
+        
 
         
     }
@@ -165,13 +171,17 @@ public class EnemyAi : MonoBehaviour
         {
             enemyHealth -= damageAmmount;
             animator.SetTrigger("isGettingHit");
-            if(enemyHealth < damageAmmount) // checking if the damage ammount is greater than current enemyhealth
+            if(enemyHealth < damageAmmount || enemyHealth < 0f) // checking if the damage ammount is greater than current enemyhealth
             {
                 enemyHealth = 0; // setting the health ammount to 0
+                
+
             }
             if(enemyHealth == 0)
             {
-                animator.SetBool("isDead", true);
+                StartCoroutine(Dead(gameObject));
+                isDead = true;
+                hS_MovementInput.screenTargets.Remove(gameObject);
             }
         
         }
@@ -213,6 +223,19 @@ public class EnemyAi : MonoBehaviour
     {
         attackSelector = Random.Range(1, 10);
         animator.SetInteger("Attack Selector", attackSelector);
+    }
+
+    IEnumerator Dead(GameObject gameObject)
+    {
+        hS_MovementInput.activeTarger = false;
+        animator.SetBool("isDead", true);
+        float sinkGameObject = gameObject.transform.position.y;
+        yield return new WaitForSeconds(2f);
+        sinkGameObject -= 2 * Time.deltaTime;
+        yield return new WaitForSeconds(2f);
+        gameObject.SetActive(false);
+        Destroy(gameObject);
+
     }
 
 
