@@ -19,6 +19,8 @@ public class SwordAttackDamage : MonoBehaviour
     public GameObject originalTransform;
 
     public Collider thisGameObjectCollider;
+
+    int index;
     //public BoxCollider damageArea;
 
     // Start is called before the first frame update
@@ -30,6 +32,7 @@ public class SwordAttackDamage : MonoBehaviour
         // enemy = GameObject.FindWithTag("Enemy").GetComponent<EnemyAi>();
         // enemyCollider = enemy.GetComponent<CapsuleCollider>();
         thisGameObjectCollider = this.gameObject.GetComponent<CapsuleCollider>();
+        enemyGameObjects = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
         
 
         Collider[] allColliders = FindObjectsOfType<Collider>();
@@ -45,7 +48,8 @@ public class SwordAttackDamage : MonoBehaviour
         {
             enemies.Add(enemy.GetComponent<EnemyAi>());
         }
-        enemyGameObjects = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
+
+        
         
 
         
@@ -69,11 +73,15 @@ public class SwordAttackDamage : MonoBehaviour
         
         if(other.CompareTag("Terrain"))
         {
+            //BUG DITO NADADAMAGE LAHAT NG ENEMY
             if(isInCollider)
             {   
-                foreach (var enemy in enemies)
+                foreach (var enemy in enemyGameObjects)
                 {
-                    enemy.takeDamage(30);
+                    if (enemy.GetComponent<Collider>().bounds.Intersects(GetComponent<Collider>().bounds))
+                    {
+                        enemy.GetComponent<EnemyAi>().takeDamage(30);
+                    }
                 }                
                     
             }
@@ -86,13 +94,18 @@ public class SwordAttackDamage : MonoBehaviour
             
         
     }
+    //HINDI NANAMAN TO GUMAGANA PUTANGINA
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy"))
+        if (other != null && enemyGameObjects.Contains(other.gameObject))
         {
             isInCollider = true;
             Debug.Log("Enemy entered collider");
+
         }
+
+        Debug.Log("i am enabled");
+
     }
 
         
@@ -103,7 +116,7 @@ public class SwordAttackDamage : MonoBehaviour
     
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Enemy"))
+        if (other != null && other.CompareTag("Enemy"))
         {
             isInCollider = true;
             Debug.Log("Enemy entered collider");
@@ -114,3 +127,4 @@ public class SwordAttackDamage : MonoBehaviour
 
 }
 //COMPARE TAG HINDI PA NAGANA 
+//NADADAMAGE LAHAT NG ENEMY
