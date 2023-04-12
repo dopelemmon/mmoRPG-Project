@@ -9711,6 +9711,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e24cfb966f425fa47bfec1667489bb42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemy: []
+  hS_MovementInput: {fileID: 0}
   speed: 25
   hit: {fileID: 1642627157328290, guid: 89632666f78a0184aae0a6be7ced23d3, type: 3}
   flash: {fileID: 0}
@@ -9804,7 +9806,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 0, b: 0.23993587, a: 1}
-  m_Intensity: 3.08
+  m_Intensity: 15
   m_Range: 5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208

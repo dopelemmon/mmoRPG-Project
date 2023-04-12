@@ -44,6 +44,11 @@ public class EnemyAi : MonoBehaviour
     int attackSelector;
     int currentAttackMode;
     bool hasDealtDamage = false;
+
+    [Header ("CAMPING BEHAVIOR")]
+    public bool isCampingBehavior;
+    public Transform campLocation;
+    public BoxCollider campCollider;
     private void Start()
     {
         player = GameObject.FindWithTag("Player").transform;
@@ -62,7 +67,16 @@ public class EnemyAi : MonoBehaviour
 
         
         
-            if(!playerInSightRange && !playerInAttackrange)Patrolling();
+            if(!isCampingBehavior)
+            {
+                if(!playerInSightRange && !playerInAttackrange)
+                {
+                    Patrolling();
+                }
+            }
+            else{
+                IsCamping();
+            }
             if(playerInSightRange && !playerInAttackrange)ChasePlayer();
             if(playerInSightRange && playerInAttackrange)AttackPlayer();
         
@@ -99,6 +113,42 @@ public class EnemyAi : MonoBehaviour
         
     }
 
+ private void IsCamping()
+{
+    if(!playerInSightRange && !playerInAttackrange)
+    {
+        // Check kung nasa loob na ng box collider.
+        if (!campCollider.bounds.Contains(transform.position))
+        {
+            // Kung hindi pa, mag-set ng random position sa loob ng box collider.
+            Vector3 randomPosition = new Vector3(
+                Random.Range(campCollider.bounds.min.x, campCollider.bounds.max.x),
+                transform.position.y,
+                Random.Range(campCollider.bounds.min.z, campCollider.bounds.max.z)
+            );
+
+            // Mag-set ng destination papunta sa random position.
+            agent.SetDestination(randomPosition);
+
+            // Set ang animation state na "isWalking" kung ang enemy ay naglalakad.
+            if (agent.velocity.magnitude > 0)
+            {
+                animator.SetBool("isRunning", true);
+            }
+            else
+            {
+                animator.SetBool("isRunning", false);
+            }
+        }
+        else
+        {
+            // Kung nasa loob na ng box collider, itigil ang paglakad at mag-set ng idle animation.
+            //agent.SetDestination(campLocation.position);
+            if(agent.velocity.magnitude == 0)
+                animator.SetBool("isRunning", false);
+        }
+    }
+}
     private void SearchWalkPoint()
     {
         //Calculate random point in range

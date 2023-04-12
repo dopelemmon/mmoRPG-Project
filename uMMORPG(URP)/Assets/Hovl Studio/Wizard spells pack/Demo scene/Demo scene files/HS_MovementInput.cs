@@ -9,6 +9,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CharacterController))]
 public class HS_MovementInput : MonoBehaviour
 {
+    EnemyAi enemyAi = new EnemyAi();
     public float velocity = 9;
     [Space]
     public float InputX;
@@ -485,7 +486,7 @@ public class HS_MovementInput : MonoBehaviour
                 if (Physics.Raycast(ray, out hit, Mathf.Infinity, collidingLayer))
                 {
                     TargetMarker.transform.position = hit.point;
-                    TargetMarker.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal) * Quaternion.LookRotation(forwardCamera);
+                    TargetMarker.transform.rotation = Quaternion.FromToRotation(Vector3.up, hit.normal) * Quaternion.LookRotation(forwardCamera).normalized;
                 }
                 else
                 {
