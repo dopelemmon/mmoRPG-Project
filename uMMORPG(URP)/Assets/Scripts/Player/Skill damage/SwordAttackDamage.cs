@@ -7,7 +7,7 @@ public class SwordAttackDamage : MonoBehaviour
     public ParticleSystem skill;
     public LayerMask EnemyLayer;
     public float damageAmount = 30f;
-    
+    GameObject enemyGameObject;
     public List<GameObject> enemyGameObjects = new List<GameObject>();
     public List<EnemyAi> enemies = new List<EnemyAi>();
 
@@ -74,20 +74,18 @@ public class SwordAttackDamage : MonoBehaviour
         if(other.CompareTag("Terrain"))
         {
             //BUG DITO NADADAMAGE LAHAT NG ENEMY
-            if(isInCollider)
-            {   
-                foreach (var enemy in enemyGameObjects)
+            
+              
+            foreach (var enemy in enemyGameObjects)
+            {
+                if (enemy.GetComponent<EnemyAi>().isInCollider)
                 {
-                    if (enemy.GetComponent<Collider>().bounds.Intersects(GetComponent<Collider>().bounds))
-                    {
-                        enemy.GetComponent<EnemyAi>().takeDamage(30);
-                    }
-                }                
+                    enemy.GetComponent<EnemyAi>().takeDamage(30);
+                }
+            }                
                     
-            }
-            else{
-                
-            }
+            
+
             
                         
         }
@@ -97,14 +95,21 @@ public class SwordAttackDamage : MonoBehaviour
     //HINDI NANAMAN TO GUMAGANA PUTANGINA
     void OnTriggerEnter(Collider other)
     {
-        if (other != null && enemyGameObjects.Contains(other.gameObject))
+        foreach (var enemy in enemyGameObjects)
         {
-            isInCollider = true;
-            Debug.Log("Enemy entered collider");
 
+            if (enemy.gameObject == other.gameObject)
+            {
+                if(other.gameObject.CompareTag("Enemy"))
+                {
+                    enemy.GetComponent<EnemyAi>().isInCollider = true;
+                    Debug.Log("Enemy entered collider");
+
+                }
+                
+            }
         }
 
-        Debug.Log("i am enabled");
 
     }
 
@@ -116,13 +121,12 @@ public class SwordAttackDamage : MonoBehaviour
     
     void OnTriggerExit(Collider other)
     {
-        if (other != null && other.CompareTag("Enemy"))
+        if (other != null && enemyGameObjects.Contains(other.gameObject))
         {
-            isInCollider = true;
-            Debug.Log("Enemy entered collider");
-        }
-    
+            isInCollider = false;
+            Debug.Log("Enemy exits collider");
 
+        }
     }
 
 }

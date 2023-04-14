@@ -5,6 +5,7 @@ using UnityEngine.AI;
 
 public class EnemyAi : MonoBehaviour
 {
+    public bool isInCollider;
     public NavMeshAgent agent;
     HS_MovementInput hS_MovementInput;
 

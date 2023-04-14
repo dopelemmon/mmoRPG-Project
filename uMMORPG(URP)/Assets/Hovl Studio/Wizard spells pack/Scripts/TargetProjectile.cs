@@ -4,9 +4,6 @@ using UnityEngine;
 
 public class TargetProjectile : MonoBehaviour
 {
-    public EnemyAi[] enemy;
-    public HS_MovementInput hS_MovementInput;
-    // public EnemyAi enemyAi;
     public float speed = 15f;
     public GameObject hit;
     public GameObject flash;
@@ -27,13 +24,6 @@ public class TargetProjectile : MonoBehaviour
     {
         FlashEffect();
         newRandom();
-
-        hS_MovementInput = GameObject.FindWithTag("Player").GetComponent<HS_MovementInput>();
-        for(int i = 0; i < enemy.Length; i++)
-        {
-            
-            enemy[i] = GameObject.FindWithTag("Player").GetComponent<HS_MovementInput>().screenTargets[i].GetComponent<EnemyAi>();
-        }
     }
 
     void newRandom()
@@ -116,15 +106,13 @@ public void HitTarget()
         foreach (Collider collider in colliders)
         {
             EnemyAi enemy = collider.GetComponent<EnemyAi>();
-            if (enemy != null && hS_MovementInput.activeTarger)
-            {
                 // Instantiate hit effect
                 var hitInstance = Instantiate(hit, enemy.transform.position + targetOffset, hitRotation);
                 var hitPs = hitInstance.GetComponent<ParticleSystem>();
                 if (hitPs != null)
                 {
                     Destroy(hitInstance, hitPs.main.duration);
-                    enemy.takeDamage(5);
+                    
                 }
                 else
                 {
@@ -132,8 +120,8 @@ public void HitTarget()
                     Destroy(hitInstance, hitPsParts.main.duration);
                 }
             }
-        }
     }
+    
 
     foreach (var detachedPrefab in Detached)
     {
