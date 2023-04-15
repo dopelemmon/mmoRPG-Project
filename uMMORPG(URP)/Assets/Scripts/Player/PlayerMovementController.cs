@@ -15,6 +15,10 @@ public class PlayerMovementController : MonoBehaviour
     float velocity;
 
     
+
+    
+
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -22,17 +26,19 @@ public class PlayerMovementController : MonoBehaviour
         characterController = GetComponent<CharacterController>();
 
         velocity = animator.GetFloat("Velocity");
+        
     }
 
     // Update is called once per frame
     void Update()
     {
         HandleMovement();
-
+        
     }
 
     void HandleMovement()
     {
+        
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
@@ -40,7 +46,7 @@ public class PlayerMovementController : MonoBehaviour
         bool runPressed = Input.GetKey(KeyCode.LeftShift);
         if(movementPressed)
         {
-
+            animator.SetBool("isMoving", movementPressed);
             float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
             transform.rotation = Quaternion.Euler(0f, angle, 0f);
@@ -48,21 +54,36 @@ public class PlayerMovementController : MonoBehaviour
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             characterController.SimpleMove(moveDir.normalized * Time.deltaTime);
         }
+        else{
+            animator.SetBool("isMoving", movementPressed);
+        }
         if(movementPressed && velocity <= 1f && !runPressed)
         {
             velocity += 2f * Time.deltaTime;
+
+            
+            
         }
         if(movementPressed && velocity >= 1f && !runPressed)
         {
+
             velocity -= 2f * Time.deltaTime;
+
+            
         }
         if(movementPressed && velocity <= 2f && runPressed)
         {
             velocity += 2f * Time.deltaTime;
+            
         }
-        if(!movementPressed && velocity >= 0f)
+        if(!movementPressed && velocity >= 0f && !runPressed)
+        {
             velocity -= 2f * Time.deltaTime;
+            
+        }
         
         animator.SetFloat("Velocity", velocity);
+        Debug.Log(runPressed);
     }
+
 }

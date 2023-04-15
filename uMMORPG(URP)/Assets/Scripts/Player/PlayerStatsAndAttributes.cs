@@ -9,6 +9,8 @@ public class PlayerStatsAndAttributes : MonoBehaviour
     public float playerMaxHealth = 100f;
     public float playerArmor;
     public float playerMaxArmor = 100f;
+
+    public float playerStamina;
     // Start is called before the first frame update
     void Start()
     {
