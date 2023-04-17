@@ -18,7 +18,7 @@ public class Addmanager : MonoBehaviour
         else
             DestroyImmediate(gameObject);
 
-        //Advertisement.Initialize("2685537");
+        ///Advertisement.Initialize("2685537");
 
     }
 
