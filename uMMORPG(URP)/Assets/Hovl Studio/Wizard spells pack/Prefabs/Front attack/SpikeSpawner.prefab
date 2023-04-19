@@ -28,6 +28,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -48,14 +49,17 @@ MonoBehaviour:
   startRotation: {x: 0, y: 0, z: 0}
   speed: 25
   drug: 1
-  craterPrefab: {fileID: 1295870212731232, guid: 7a531479fd996f14ea21077140826fb4,
-    type: 3}
+  craterPrefab: {fileID: 1295870212731232, guid: 7a531479fd996f14ea21077140826fb4, type: 3}
   ps: {fileID: 0}
-  playPS: 0
+  playPS: 1
   spawnRate: 1.5
   spawnDuration: 0.5
   positionOffset: 1
   changeScale: 1
+  effectWithAnimation: 0
+  anim: []
+  delay: 0
+  playMeshEffect: 0
 --- !u!82 &82336806648429828
 AudioSource:
   m_ObjectHideFlags: 0

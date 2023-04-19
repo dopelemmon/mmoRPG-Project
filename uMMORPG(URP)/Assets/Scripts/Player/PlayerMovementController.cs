@@ -57,11 +57,13 @@ public class PlayerMovementController : MonoBehaviour
 
         if(!enemyInSightRange)
         {
-            if(playerState == state.Normal)HandleMovement(); 
+            playerState = state.Normal;
+            HandleMovement();
         }
         if(enemyInSightRange)
         {
-            if(playerState == state.Fighting)FighitngMovement();
+            playerState = state.Fighting;
+            FighitngMovement();
         }
         
         
@@ -71,120 +73,129 @@ public class PlayerMovementController : MonoBehaviour
 
     void HandleMovement()
     {
-        animator.SetBool("isFighting", false);
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
-        bool movementPressed = direction.magnitude >= 0.1f;
-        bool runPressed = Input.GetKey(KeyCode.LeftShift);
-        if(movementPressed)
+        if(playerState == state.Normal)
         {
-            animator.SetBool("isMoving", movementPressed);
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            
+            animator.SetBool("isFighting", false);
+            float horizontal = Input.GetAxisRaw("Horizontal");
+            float vertical = Input.GetAxisRaw("Vertical");
+            Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
+            bool movementPressed = direction.magnitude >= 0.1f;
+            bool runPressed = Input.GetKey(KeyCode.LeftShift);
+            if(movementPressed)
+            {
+                animator.SetBool("isMoving", movementPressed);
+                float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+                float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+                transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
-            Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-            characterController.SimpleMove(moveDir.normalized * Time.deltaTime);
-        }
-        else{
-            animator.SetBool("isMoving", movementPressed);
-        }
-        if(movementPressed && velocity <= 1f && !runPressed)
-        {
-            velocity += 2f * Time.deltaTime;
+                Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
+                characterController.SimpleMove(moveDir.normalized * Time.deltaTime);
+            }
+            else{
+                animator.SetBool("isMoving", movementPressed);
+            }
+            if(movementPressed && velocity <= 1f && !runPressed)
+            {
+                velocity += 2f * Time.deltaTime;
 
-            
-            
-        }
-        if(movementPressed && velocity >= 1f && !runPressed)
-        {
+                
+                
+            }
+            if(movementPressed && velocity >= 1f && !runPressed)
+            {
 
-            velocity -= 2f * Time.deltaTime;
+                velocity -= 2f * Time.deltaTime;
 
+                
+            }
+            if(movementPressed && velocity <= 2f && runPressed)
+            {
+                velocity += 2f * Time.deltaTime;
+                
+            }
+            if(!movementPressed && velocity >= 0f && !runPressed)
+            {
+                velocity -= 2f * Time.deltaTime;
+                
+            }
             
+            animator.SetFloat("Velocity", velocity);
+            Debug.Log(runPressed);
         }
-        if(movementPressed && velocity <= 2f && runPressed)
-        {
-            velocity += 2f * Time.deltaTime;
-            
-        }
-        if(!movementPressed && velocity >= 0f && !runPressed)
-        {
-            velocity -= 2f * Time.deltaTime;
-            
-        }
-        
-        animator.SetFloat("Velocity", velocity);
-        Debug.Log(runPressed);
+        return;
     }
 
     void FighitngMovement()
     {
-        animator.SetBool("isFighting", true);
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        bool forwardPressed = Input.GetKey(KeyCode.W);
-        bool backPressed = Input.GetKey(KeyCode.S);
-        bool leftPressed = Input.GetKey(KeyCode.A);
-        bool rightPressed = Input.GetKey(KeyCode.D);
+        if(playerState == state.Fighting)
+        {
 
-        Vector3 camDirection = cam.transform.position - transform.position;
-        // camDirection.y = 0f;
-        float targetAngle = Mathf.Atan2(-camDirection.x, -camDirection.z) * Mathf.Rad2Deg;
-        //Quaternion targetRotation = Quaternion.LookRotation(-camDirection);
-        float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-        transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            animator.SetBool("isFighting", true);
+            float horizontal = Input.GetAxisRaw("Horizontal");
+            float vertical = Input.GetAxisRaw("Vertical");
+            bool forwardPressed = Input.GetKey(KeyCode.W);
+            bool backPressed = Input.GetKey(KeyCode.S);
+            bool leftPressed = Input.GetKey(KeyCode.A);
+            bool rightPressed = Input.GetKey(KeyCode.D);
 
-        Vector3 applyGravity = new Vector3(0f, _gravity, 0f).normalized;
+            Vector3 camDirection = cam.transform.position - transform.position;
+            // camDirection.y = 0f;
+            float targetAngle = Mathf.Atan2(-camDirection.x, -camDirection.z) * Mathf.Rad2Deg;
+            //Quaternion targetRotation = Quaternion.LookRotation(-camDirection);
+            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
+            transform.rotation = Quaternion.Euler(0f, angle, 0f);
 
-        
+            Vector3 applyGravity = new Vector3(0f, _gravity, 0f).normalized;
 
-        if(!characterController.isGrounded)
-        {
-            applyGravity.y -= _gravity * Time.deltaTime;
-            characterController.Move(applyGravity);
+            
+
+            if(!characterController.isGrounded)
+            {
+                applyGravity.y -= _gravity * Time.deltaTime;
+                characterController.Move(applyGravity);
+            }
+            else{
+                applyGravity.y = 0f;
+            }
+            
+            
+            if(forwardPressed && velocityZ < 1f)
+            {
+                velocityZ += Time.deltaTime * acceleration;
+            }
+            if(backPressed && velocityZ > -1f)
+            {
+                velocityZ -= Time.deltaTime * acceleration;
+            }
+            if(leftPressed && velocityX > -1f)
+            {
+                velocityX -= Time.deltaTime * acceleration;
+            }
+            if(rightPressed && velocityX < 1f)
+            {
+                velocityX += Time.deltaTime * acceleration;
+            }
+            //RESET VELOCITY
+            if(!forwardPressed && velocityZ > 0.0f)
+            {
+                velocityZ -= Time.deltaTime * deceleration;
+            }
+            if(!leftPressed && velocityX < 0.0f)
+            {
+                velocityX += Time.deltaTime * deceleration;
+            }
+            if(!rightPressed && velocityX > 0.0f)
+            {
+                velocityX -= Time.deltaTime * deceleration;
+            }
+            if(!backPressed && velocityZ < 0.0f)
+            {
+                velocityZ += Time.deltaTime * deceleration;
+            }
+            animator.SetFloat("Fighting Velocity Z", velocityZ);
+            animator.SetFloat("Fighting Velocity X", velocityX);
         }
-        else{
-            applyGravity.y = 0f;
-        }
-        
-        
-        if(forwardPressed && velocityZ < 1f)
-        {
-            velocityZ += Time.deltaTime * acceleration;
-        }
-        if(backPressed && velocityZ > -1f)
-        {
-            velocityZ -= Time.deltaTime * acceleration;
-        }
-        if(leftPressed && velocityX > -1f)
-        {
-            velocityX -= Time.deltaTime * acceleration;
-        }
-        if(rightPressed && velocityX < 1f)
-        {
-            velocityX += Time.deltaTime * acceleration;
-        }
-        //RESET VELOCITY
-        if(!forwardPressed && velocityZ > 0.0f)
-        {
-            velocityZ -= Time.deltaTime * deceleration;
-        }
-        if(!leftPressed && velocityX < 0.0f)
-        {
-            velocityX += Time.deltaTime * deceleration;
-        }
-        if(!rightPressed && velocityX > 0.0f)
-        {
-            velocityX -= Time.deltaTime * deceleration;
-        }
-        if(!backPressed && velocityZ < 0.0f)
-        {
-            velocityZ += Time.deltaTime * deceleration;
-        }
-        animator.SetFloat("Fighting Velocity Z", velocityZ);
-        animator.SetFloat("Fighting Velocity X", velocityX);
         
 
     }
