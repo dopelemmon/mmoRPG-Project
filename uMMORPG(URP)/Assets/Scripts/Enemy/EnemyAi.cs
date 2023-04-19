@@ -10,6 +10,8 @@ public class EnemyAi : MonoBehaviour
     public GameObject player;
     public Animator animator;
 
+    PlayerMovementController playerMovementController;
+
     public LayerMask whatIsGround, whatIsPlayer;
 
     //*****************CAMPING BEHAVIOR ********************
@@ -49,6 +51,7 @@ public class EnemyAi : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         animator.GetComponent<Animator>();
         playerStats = player.GetComponent<PlayerStatsAndAttributes>();
+        playerMovementController = player.GetComponent<PlayerMovementController>();
     
     }
 
@@ -66,9 +69,17 @@ public class EnemyAi : MonoBehaviour
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
 
-        if(!isCampingBehavior && !playerInSightRange && !playerInAttackRange)Patroling();
+        if(!isCampingBehavior && !playerInSightRange && !playerInAttackRange)
+        {
+            Patroling();
+            
+        }
         if(isCampingBehavior && !playerInSightRange && !playerInAttackRange)Camping();
-        if(playerInSightRange && !playerInAttackRange)ChasePlayer();
+        if(playerInSightRange && !playerInAttackRange)
+        {
+            ChasePlayer();
+            
+        }
         if(playerInSightRange && playerInAttackRange)AttackPlayer();
 
        //SETTING LOCAL VARIABLE TO ANIMATOR PARAMETERS
@@ -81,6 +92,7 @@ public class EnemyAi : MonoBehaviour
     }
      void Patroling()
     {
+        
         
         animator.SetBool(isWalkingHash, true); //plays walking animation
         if(!walkPointSet)
@@ -118,6 +130,7 @@ public class EnemyAi : MonoBehaviour
 
     void Camping()
     {
+        
         animator.SetBool(isWalkingHash, true);
         animator.SetBool(isRunningHash, false);
         
@@ -141,6 +154,7 @@ public class EnemyAi : MonoBehaviour
     
      void ChasePlayer()
     {
+        
         //CHANGE FROM WALKING ANIMATION TO RUNNING ANIMATION
         animator.SetBool(isRunningHash, true);
         animator.SetBool(isWalkingHash, false);
